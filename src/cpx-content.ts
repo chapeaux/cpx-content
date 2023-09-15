@@ -2,6 +2,10 @@ export class CPXContent extends HTMLElement {
   static get tag() {
     return "cpx-content";
   }
+  static get observedAttributes() {
+    return ["url", "ready"];
+  }
+
   _template;
   get template() {
     return this._template;
@@ -10,13 +14,14 @@ export class CPXContent extends HTMLElement {
     if (this._template === val) return;
     this._template = val;
   }
+
   _auto = false;
   _ready: boolean;
   get ready() {
     return this._ready;
   }
   set ready(val) {
-    if (this._ready === val) return;
+    if (this._ready === !!val) return;
     this._ready = val;
     this.setAttribute("ready", this._ready.toString());
   }
@@ -113,9 +118,7 @@ export class CPXContent extends HTMLElement {
     //top.addEventListener("params-ready", this._changeAttr);
   }
 
-  static get observedAttributes() {
-    return ["url"];
-  }
+  
 
   attributeChangedCallback(name, oldVal, newVal) {
     this[name] = newVal;
@@ -199,4 +202,5 @@ export class CPXContent extends HTMLElement {
     }
   }
 }
+
 window.customElements.define(CPXContent.tag, CPXContent);
