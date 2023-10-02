@@ -1,0 +1,35 @@
+export declare class CPXContent extends HTMLElement {
+    static get tag(): string;
+    static get observedAttributes(): string[];
+    _template: any;
+    get template(): any;
+    set template(val: any);
+    _auto: boolean;
+    _ready: boolean;
+    get ready(): boolean;
+    set ready(val: boolean);
+    _cache: RequestCache;
+    _url: any;
+    _data: any;
+    get auto(): boolean;
+    set auto(val: boolean);
+    get cache(): RequestCache;
+    set cache(val: RequestCache);
+    get url(): URL;
+    set url(val: URL);
+    _lang: string;
+    get lang(): string;
+    set lang(val: string);
+    _placement: any;
+    get placement(): any;
+    set placement(val: any);
+    get data(): any;
+    set data(val: any);
+    filterString(facets: any): string;
+    constructor();
+    connectedCallback(): Promise<void>;
+    attributeChangedCallback(name: any, oldVal: any, newVal: any): void;
+    prepTemplate(): void;
+    renderTemplate(data: any, ele?: any): void;
+    render(): Promise<void>;
+}

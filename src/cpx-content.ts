@@ -3,7 +3,7 @@ export class CPXContent extends HTMLElement {
     return "cpx-content";
   }
   static get observedAttributes() {
-    return ["url", "ready"];
+    return ["url", "ready", "cache", "lang", "placement"];
   }
 
   _template;
@@ -73,6 +73,22 @@ export class CPXContent extends HTMLElement {
     this.setAttribute("url", val.toString());
   }
 
+  _lang = "en";
+  get lang() { return this._lang;}
+  set lang(val) { 
+    if (this._lang === val) return;
+    this._lang = val;
+    this.setAttribute("lang", val);
+  }
+
+  _placement;
+  get placement() { return this._placement; }
+  set placement(val) {
+    if (this._placement === val) return;
+    this._placement = val;
+    this.setAttribute("placement", val);
+  }
+
   get data() { return this._data; }
   set data(val) {
     if (this._data === val) return;
@@ -99,23 +115,28 @@ export class CPXContent extends HTMLElement {
 
   constructor() {
     super();
-    let tmpl = this.querySelector("template");
-    if (tmpl) {
-      this.attachShadow({ mode: "open" });
-      this.template = tmpl.cloneNode(true);
-      this.prepTemplate();
-    } else if (this.getAttribute("template")) {
-      this.attachShadow({ mode: "open" });
-      this.template = top.document.querySelector(this.getAttribute("template"))
-        .cloneNode(true);
-      this.prepTemplate();
-    }
+    this.attachShadow({ mode: "open" });
+    // let tmpl = this.querySelector("template");
+    // if (tmpl) {
+    //   this.attachShadow({ mode: "open" });
+    //   this.template = tmpl.cloneNode(true);
+    //   this.prepTemplate();
+    // } else if (this.getAttribute("template")) {
+    //   this.attachShadow({ mode: "open" });
+    //   this.template = top.document.querySelector(this.getAttribute("template"))
+    //     .cloneNode(true);
+    //   this.prepTemplate();
+    // }
 
     //this._changeAttr = this._changeAttr.bind(this);
   }
 
-  connectedCallback() {
+  async connectedCallback() {
     //top.addEventListener("params-ready", this._changeAttr);
+    const autoVal = this.getAttribute('auto');
+    if ( autoVal !== null && !autoVal) {
+      await this.render();
+    }
   }
 
   
@@ -189,7 +210,23 @@ export class CPXContent extends HTMLElement {
     }
   }
 
-  render() {
+  async render() {
+    const resp = await fetch(this.url);
+    const data = await resp.json();
+    const placement = data['data']['placements']
+    .filter(n=>n['placement_key'] === this.placement)[0];
+    const translation = placement['blocks'][0]['translations']
+    .filter(l=>l['langcode'] === this.lang)[0];
+    const content = translation['html'];
+
+    this.shadowRoot.innerHTML = `<style>
+      :host { display: block; 
+        
+      max-height: 100vh; }
+    </style>
+    ${content}
+    `;
+    /*
     if (this.data) {
       let repeatEls = this.shadowRoot.querySelectorAll("[data-repeat]");
       if (repeatEls.length > 0) {
@@ -200,6 +237,7 @@ export class CPXContent extends HTMLElement {
       }
       this.renderTemplate(this.data, this.shadowRoot);
     }
+    */
   }
 }
 
